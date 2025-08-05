@@ -1,6 +1,6 @@
 import { config } from '../config';
 
-const OPENAI_API_BASE_URL = 'https://api.openai.com/v1';
+const OPENAI_API_BASE_URL = config.openaiBaseUrl || 'https://api.openai.com/v1';
 
 /**
  * Sends a streaming chat completion request to the OpenAI API via raw fetch
@@ -28,7 +28,12 @@ const fetchOpenaiResponse = async (
 		headers['OpenAI-Organization'] = organizationId;
 	}
 
-	const url = `${OPENAI_API_BASE_URL}/chat/completions`;
+	let url = `${OPENAI_API_BASE_URL}/chat/completions`;
+	if (config.openaiUrlParams) {
+		const paramdata = JSON.parse(config.openaiUrlParams);
+		const params = new URLSearchParams(paramdata);
+		url += `?${params}`;
+	}
 
 	const response = await fetch(url, {
 		body: JSON.stringify(payload),
